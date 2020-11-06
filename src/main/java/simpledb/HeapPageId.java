@@ -2,7 +2,8 @@ package simpledb;
 
 /** Unique identifier for HeapPage objects. */
 public class HeapPageId implements PageId {
-
+    private final int tableId;
+    private final int pgNo;
     /**
      * Constructor. Create a page id structure for a specific page of a
      * specific table.
@@ -12,21 +13,25 @@ public class HeapPageId implements PageId {
      */
     public HeapPageId(int tableId, int pgNo) {
         // some code goes here
+        this.tableId = tableId;
+        this.pgNo = pgNo;
     }
 
     /** @return the table associated with this PageId */
+    @Override
     public int getTableId() {
         // some code goes here
-        return 0;
+        return tableId;
     }
 
     /**
      * @return the page number in the table getTableId() associated with
      *   this PageId
      */
-    public int pageNumber() {
+    @Override
+    public int getPageNumber() {
         // some code goes here
-        return 0;
+        return pgNo;
     }
 
     /**
@@ -35,9 +40,11 @@ public class HeapPageId implements PageId {
      *   key in a hash table in the BufferPool, for example.)
      * @see BufferPool
      */
+    @Override
     public int hashCode() {
         // some code goes here
-        throw new UnsupportedOperationException("implement this");
+        String hash = "" + tableId +pgNo;
+        return hash.hashCode();
     }
 
     /**
@@ -47,9 +54,21 @@ public class HeapPageId implements PageId {
      * @return true if the objects are equal (e.g., page numbers and table
      *   ids are the same)
      */
+    @Override
     public boolean equals(Object o) {
         // some code goes here
+        if(o instanceof PageId){
+            PageId pi = (PageId) o;
+            if(pi.getTableId() == tableId && pi.getPageNumber() == pgNo){
+                return true;
+            }
+        }
         return false;
+    }
+
+    @Override
+    public int pageNumber() {
+        return pgNo;
     }
 
     /**
@@ -58,11 +77,12 @@ public class HeapPageId implements PageId {
      *  number of integers that corresponds to number of args to one of the
      *  constructors.
      */
+    @Override
     public int[] serialize() {
         int data[] = new int[2];
 
         data[0] = getTableId();
-        data[1] = pageNumber();
+        data[1] = getPageNumber();
 
         return data;
     }
