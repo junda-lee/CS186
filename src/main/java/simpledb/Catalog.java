@@ -21,7 +21,7 @@ public class Catalog {
      * Creates a new, empty catalog.
      */
     private List<table> tables ;
-    static class table{
+    private static class table{
         public DbFile dbFile;
         public String name;
         public String pkeyField;
@@ -52,7 +52,7 @@ public class Catalog {
      * conflict exists, use the last table to be added as the table for a given name.
      */
     public void addTable(DbFile file, String name, String pkeyField) {
-        // some code goes here
+        // name represent the name of table
         table newtable = new table(file, name, pkeyField, file.getId());
         for (int i=0;i<tables.size();i++){
             table t = tables.get(i);

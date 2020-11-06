@@ -16,6 +16,8 @@ public interface PageId {
     /** @return the unique tableid hashcode with this PageId */
     public int getTableId();
 
+    public int getPageNumber();
+
     /**
      * @return a hash code for this page, represented by the concatenation of
      *   the table number and the page number (needed if a PageId is used as a

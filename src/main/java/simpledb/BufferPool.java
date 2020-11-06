@@ -1,6 +1,7 @@
 package simpledb;
 
 import java.io.*;
+import java.util.concurrent.ConcurrentHashMap;
 
 /**
  * BufferPool manages the reading and writing of pages into memory from
@@ -13,12 +14,25 @@ import java.io.*;
  */
 public class BufferPool {
     /** Bytes per page, including header. */
-    public static final int PAGE_SIZE = 4096;
+    private static final int DEFAULT_PAGE_SIZE = 4096;
+
+    private static int pageSize = DEFAULT_PAGE_SIZE;
 
     /** Default number of pages passed to the constructor. This is used by
-    other classes. BufferPool should use the numPages argument to the
-    constructor instead. */
+     other classes. BufferPool should use the numPages argument to the
+     constructor instead. */
     public static final int DEFAULT_PAGES = 50;
+
+    private final int numPages;
+    private final ConcurrentHashMap<Integer,Page> pageStore;
+
+    /**
+     * return the pagesize of the page
+     * @return
+     */
+    public static int getPagesize(){
+        return pageSize;
+    }
 
     /**
      * Creates a BufferPool that caches up to numPages pages.
@@ -27,6 +41,8 @@ public class BufferPool {
      */
     public BufferPool(int numPages) {
         // some code goes here
+        this.numPages = numPages;
+        pageStore = new ConcurrentHashMap<Integer,Page>();
     }
 
     /**
@@ -37,7 +53,7 @@ public class BufferPool {
      * The retrieved page should be looked up in the buffer pool.  If it
      * is present, it should be returned.  If it is not present, it should
      * be added to the buffer pool and returned.  If there is insufficient
-     * space in the buffer pool, an page should be evicted and the new page
+     * space in the buffer pool, a page should be evicted and the new page
      * should be added in its place.
      *
      * @param tid the ID of the transaction requesting the page
@@ -45,9 +61,14 @@ public class BufferPool {
      * @param perm the requested permissions on the page
      */
     public  Page getPage(TransactionId tid, PageId pid, Permissions perm)
-        throws TransactionAbortedException, DbException {
+            throws TransactionAbortedException, DbException {
         // some code goes here
-        return null;
+        if(!pageStore.containsKey(pid.hashCode())){
+            DbFile dbfile = Database.getCatalog().getDbFile(pid.getTableId());
+            Page page = dbfile.readPage(pid);
+            pageStore.put(pid.hashCode(),page);
+        }
+        return pageStore.get(pid.hashCode());
     }
 
     /**

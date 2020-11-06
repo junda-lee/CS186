@@ -47,7 +47,6 @@ public class HeapPage implements Page {
         header = new byte[getHeaderSize()];
         for (int i=0; i<header.length; i++)
             header[i] = dis.readByte();
-
         try{
             // allocate and read the actual records of this page
             tuples = new Tuple[numSlots];
@@ -66,23 +65,22 @@ public class HeapPage implements Page {
     */
     private int getNumTuples() {        
         // some code goes here
-        return 0;
-
+        int num = (int)Math.floor((BufferPool.getPagesize() * 8 * 1.0) / (td.getSize() * 8 + 1));
+        return num;
     }
 
     /**
      * Computes the number of bytes in the header of a page in a HeapFile with each tuple occupying tupleSize bytes
      * @return the number of bytes in the header of a page in a HeapFile with each tuple occupying tupleSize bytes
      */
-    private int getHeaderSize() {        
-        
-        // some code goes here
-        return 0;
-                 
+    private int getHeaderSize() {
+
+        return (int)Math.ceil(getNumTuples()*1.0/8);
     }
     
     /** Return a view of this page before it was modified
         -- used by recovery */
+    @Override
     public HeapPage getBeforeImage(){
         try {
             return new HeapPage(pid,oldData);
@@ -94,6 +92,7 @@ public class HeapPage implements Page {
         return null;
     }
     
+    @Override
     public void setBeforeImage() {
         oldData = getPageData().clone();
     }
@@ -101,9 +100,9 @@ public class HeapPage implements Page {
     /**
      * @return the PageId associated with this page.
      */
+    @Override
     public HeapPageId getId() {
-    // some code goes here
-    throw new UnsupportedOperationException("implement this");
+        return pid;
     }
 
     /**
@@ -151,8 +150,9 @@ public class HeapPage implements Page {
      * @see #HeapPage
      * @return A byte array correspond to the bytes of this page.
      */
+    @Override
     public byte[] getPageData() {
-        int len = BufferPool.PAGE_SIZE;
+        int len = BufferPool.getPagesize();
         ByteArrayOutputStream baos = new ByteArrayOutputStream(len);
         DataOutputStream dos = new DataOutputStream(baos);
 
@@ -195,7 +195,7 @@ public class HeapPage implements Page {
         }
 
         // padding
-        int zerolen = BufferPool.PAGE_SIZE - (header.length + td.getSize() * tuples.length); //- numSlots * td.getSize();
+        int zerolen = BufferPool.getPagesize() - (header.length + td.getSize() * tuples.length); //- numSlots * td.getSize();
         byte[] zeroes = new byte[zerolen];
         try {
             dos.write(zeroes, 0, zerolen);
@@ -222,7 +222,7 @@ public class HeapPage implements Page {
      * @return The returned ByteArray.
      */
     public static byte[] createEmptyPageData() {
-        int len = BufferPool.PAGE_SIZE;
+        int len = BufferPool.getPagesize();
         return new byte[len]; //all 0
     }
 
