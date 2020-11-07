@@ -254,6 +254,7 @@ public class HeapPage implements Page {
      * Marks this page as dirty/not dirty and record that transaction
      * that did the dirtying
      */
+    @Override
     public void markDirty(boolean dirty, TransactionId tid) {
         // some code goes here
 	// not necessary for lab1
@@ -262,6 +263,7 @@ public class HeapPage implements Page {
     /**
      * Returns the tid of the transaction that last dirtied this page, or null if the page is not dirty
      */
+    @Override
     public TransactionId isDirty() {
         // some code goes here
 	// Not necessary for lab1
@@ -273,16 +275,31 @@ public class HeapPage implements Page {
      */
     public int getNumEmptySlots() {
         // some code goes here
-        return 0;
+        int cnt = 0;
+        for(int i=0;i<numSlots;++i){
+            if(!isSlotUsed(i)){
+                ++cnt;
+            }
+        }
+        return cnt;
     }
+
+
 
     /**
      * Returns true if associated slot on this page is filled.
      */
     public boolean isSlotUsed(int i) {
         // some code goes here
-        return false;
+        // use bitmap
+        int quot = i/8;
+        int remainder = i%8;
+
+        int bitidx = header[quot];
+        int bit = (bitidx>>remainder) & 1;
+        return bit == 1;
     }
+
 
     /**
      * Abstraction to fill or clear a slot on this page.
@@ -296,9 +313,16 @@ public class HeapPage implements Page {
      * @return an iterator over all tuples on this page (calling remove on this iterator throws an UnsupportedOperationException)
      * (note that this iterator shouldn't return tuples in empty slots!)
      */
+
     public Iterator<Tuple> iterator() {
         // some code goes here
-        return null;
+        ArrayList<Tuple> filledTuples = new ArrayList<Tuple>();
+        for(int i = 0;i < numSlots; ++i){
+            if(isSlotUsed(i)){
+                filledTuples.add(tuples[i]);
+            }
+        }
+        return filledTuples.iterator();
     }
 
 }
