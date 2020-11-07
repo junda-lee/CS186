@@ -1,6 +1,9 @@
 package simpledb;
 
+import com.sun.xml.internal.ws.policy.privateutil.PolicyUtils;
+
 import java.io.*;
+import java.security.cert.TrustAnchor;
 import java.util.*;
 
 /**
@@ -15,6 +18,10 @@ import java.util.*;
  */
 public class HeapFile implements DbFile {
 
+
+    private final TupleDesc td;
+    private final File file;
+
     /**
      * Constructs a heap file backed by the specified file.
      * 
@@ -24,6 +31,8 @@ public class HeapFile implements DbFile {
      */
     public HeapFile(File f, TupleDesc td) {
         // some code goes here
+        this.file = f;
+        this.td = td;
     }
 
     /**
@@ -33,7 +42,7 @@ public class HeapFile implements DbFile {
      */
     public File getFile() {
         // some code goes here
-        return null;
+        return file;
     }
 
     /**
@@ -45,9 +54,10 @@ public class HeapFile implements DbFile {
      * 
      * @return an ID uniquely identifying this HeapFile.
      */
+    @Override
     public int getId() {
         // some code goes here
-        throw new UnsupportedOperationException("implement this");
+        return file.getAbsoluteFile().hashCode();
     }
 
     /**
@@ -55,18 +65,38 @@ public class HeapFile implements DbFile {
      * 
      * @return TupleDesc of this DbFile.
      */
+    @Override
     public TupleDesc getTupleDesc() {
         // some code goes here
-        throw new UnsupportedOperationException("implement this");
+        return td;
     }
 
     // see DbFile.java for javadocs
     public Page readPage(PageId pid) {
         // some code goes here
-        return null;
+        int tableId = pid.getTableId();
+        int pgNo = pid.getPageNumber();
+
+        try(RandomAccessFile f = new RandomAccessFile(file, "r")){
+            if ((pgNo + 1) * BufferPool.getPagesize() > file.length()){
+                throw new IllegalArgumentException(String.format("table %d page %d is invalid", tableId, pgNo));
+            }
+            byte[] bytes = new byte[BufferPool.getPagesize()];
+            f.seek(pgNo * BufferPool.getPagesize());
+            int read = f.read(bytes, 0, BufferPool.getPagesize());
+            if (read != BufferPool.getPagesize()){
+                throw new IllegalArgumentException(String.format("table %d page %d read %d bytes", tableId, pgNo, read));
+            }
+            HeapPageId id = new HeapPageId(tableId, pgNo);
+            return new HeapPage(id, bytes);
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+        throw new IllegalArgumentException(String.format("table %d page %d is invalid", tableId, pgNo));
     }
 
     // see DbFile.java for javadocs
+    @Override
     public void writePage(Page page) throws IOException {
         // some code goes here
         // not necessary for proj1
@@ -81,6 +111,7 @@ public class HeapFile implements DbFile {
     }
 
     // see DbFile.java for javadocs
+    @Override
     public ArrayList<Page> insertTuple(TransactionId tid, Tuple t)
             throws DbException, IOException, TransactionAbortedException {
         // some code goes here
