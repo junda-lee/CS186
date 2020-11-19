@@ -77,7 +77,6 @@ public class TestUtil {
             }
             tuplist.add(tup);
         }
-
         TupleIterator result = new TupleIterator(td, tuplist);
         result.open();
         return result;

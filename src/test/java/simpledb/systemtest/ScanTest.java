@@ -1,7 +1,5 @@
 package simpledb.systemtest;
 
-import simpledb.systemtest.SystemTestUtil;
-
 import static org.junit.Assert.*;
 
 import java.io.File;
@@ -10,7 +8,6 @@ import java.util.ArrayList;
 import java.util.NoSuchElementException;
 import java.util.Random;
 
-import org.junit.Before;
 import org.junit.Test;
 
 import simpledb.*;
@@ -21,6 +18,7 @@ import simpledb.*;
  * up dumping the contents of f4.0.txt.
  */
 public class ScanTest extends SimpleDbTestBase {
+
     private final static Random r = new Random();
 
     /** Tests the scan operator for a table with the specified dimensions. */

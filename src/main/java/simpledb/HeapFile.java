@@ -107,7 +107,8 @@ public class HeapFile implements DbFile {
      */
     public int numPages() {
         // some code goes here
-        return 0;
+        int num = (int)Math.floor(file.length() * 1.0 / BufferPool.getPagesize());
+        return num;
     }
 
     // see DbFile.java for javadocs
@@ -130,7 +131,7 @@ public class HeapFile implements DbFile {
     @Override
     public DbFileIterator iterator(TransactionId tid) {
         // some code goes here
-        return null;
+        return new HeapFileIterator(this, tid);
     }
 
     public static final class HeapFileIterator implements  DbFileIterator{

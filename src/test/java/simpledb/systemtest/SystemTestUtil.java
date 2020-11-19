@@ -13,6 +13,7 @@ import org.junit.Assert;
 import simpledb.*;
 
 public class SystemTestUtil {
+
     public static final TupleDesc SINGLE_INT_DESCRIPTOR =
             new TupleDesc(new Type[]{Type.INT_TYPE});
 
@@ -81,7 +82,7 @@ public class SystemTestUtil {
         // Convert the tuples list to a heap file and open it
         File temp = File.createTempFile("table", ".dat");
         temp.deleteOnExit();
-        HeapFileEncoder.convert(tuples, temp, BufferPool.PAGE_SIZE, columns);
+        HeapFileEncoder.convert(tuples, temp, BufferPool.getPagesize(), columns);
         return temp;
     }
 
