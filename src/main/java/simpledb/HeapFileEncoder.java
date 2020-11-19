@@ -95,10 +95,12 @@ public class HeapFileEncoder {
       for (int i = 0; i < numFields ; i++) {
           nrecbytes += typeAr[i].getLen();
       }
+      // 没页能存多少records
       int nrecords = (npagebytes * 8) /  (nrecbytes * 8 + 1);  //floor comes for free
       
     //  per record, we need one bit; there are nrecords per page, so we need
     // nrecords bits, i.e., ((nrecords/32)+1) integers.
+      // 需要多少头字节
     int nheaderbytes = (nrecords / 8);
     if (nheaderbytes * 8 < nrecords)
         nheaderbytes++;  //ceiling
@@ -145,7 +147,7 @@ public class HeapFileEncoder {
                     System.out.println ("BAD LINE : " + s);
                 }
             }
-            else   if (typeAr[fieldNo] == Type.STRING_TYPE) {
+            else if (typeAr[fieldNo] == Type.STRING_TYPE) {
                 s = s.trim();
                 int overflow = Type.STRING_LEN - s.length();
                 if (overflow < 0) {

@@ -1,5 +1,4 @@
 package simpledb;
-import java.util.*;
 import java.io.*;
 
 public class SimpleDb {
@@ -12,19 +11,19 @@ public class SimpleDb {
                 System.err.println("Unexpected number of arguments to convert ");
                 return;
             }
-            File sourceTxtFile=new File(args[1]);
-            File targetDatFile=new File(args[1].replaceAll(".txt", ".dat"));
-            int numOfAttributes=Integer.parseInt(args[2]);
+            File sourceTxtFile = new File(args[1]);
+            File targetDatFile = new File(args[1].replaceAll(".txt", ".dat"));
+            int numOfAttributes = Integer.parseInt(args[2]);
             Type[] ts = new Type[numOfAttributes];
-            char fieldSeparator=',';
+            char fieldSeparator = ',';
 
             if (args.length == 3) 
-                for (int i=0;i<numOfAttributes;i++)
-                    ts[i]=Type.INT_TYPE;
+                for (int i = 0;i < numOfAttributes; i++)
+                    ts[i] = Type.INT_TYPE;
             else {
-                String typeString=args[3];
+                String typeString = args[3];
                 String[] typeStringAr = typeString.split(",");
-                if (typeStringAr.length!=numOfAttributes)
+                if (typeStringAr.length != numOfAttributes)
                 {
                         System.err.println("The number of types does not agree with the number of columns");
                         return;

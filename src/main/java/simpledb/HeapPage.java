@@ -35,7 +35,6 @@ public class HeapPage implements Page {
      * <p>
      * @see Database#getCatalog
      * @see Catalog#getTupleDesc
-     * @see BufferPool#PAGE_SIZE
      */
     public HeapPage(HeapPageId id, byte[] data) throws IOException {
         this.pid = id;
@@ -70,7 +69,6 @@ public class HeapPage implements Page {
     }
 
     /**
-     * Computes the number of bytes in the header of a page in a HeapFile with each tuple occupying tupleSize bytes
      * @return the number of bytes in the header of a page in a HeapFile with each tuple occupying tupleSize bytes
      */
     private int getHeaderSize() {

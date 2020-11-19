@@ -13,7 +13,6 @@ import java.util.*;
  * user program before it can be used -- eventually, this should be converted
  * to a catalog that reads a catalog table from disk.
  */
-
 public class Catalog {
 
     /**
@@ -157,7 +156,7 @@ public class Catalog {
 
     public String getTableName(int id) {
         // some code goes here
-        for (table t :tables){
+        for (table t : tables){
             if (t.tableId==id){
                 return t.name;
             }

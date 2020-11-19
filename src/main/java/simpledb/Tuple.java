@@ -1,6 +1,8 @@
 package simpledb;
 
 import java.io.Serializable;
+import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Iterator;
 
 /**
@@ -90,9 +92,19 @@ public class Tuple implements Serializable {
      */
     public String toString() {
         // some code goes here
-        throw new UnsupportedOperationException("Implement this");
+        ArrayList<String> res = new ArrayList();
+
+        for (Field field : fields){
+            res.add(field.toString());
+        }
+        return String.join("\n", res);
     }
     
+    /**
+     * @return
+     *        An iterator which iterates over all the fields of this tuple
+     * */
+
     /**
      * @return
      *        An iterator which iterates over all the fields of this tuple
@@ -100,6 +112,7 @@ public class Tuple implements Serializable {
     public Iterator<Field> fields()
     {
         // some code goes here
-        return null;
+        return (Iterator<Field>) Arrays.asList(fields).iterator();
     }
+
 }

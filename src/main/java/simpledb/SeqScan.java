@@ -1,5 +1,6 @@
 package simpledb;
 
+import javax.xml.crypto.Data;
 import java.util.*;
 
 /**
@@ -10,6 +11,11 @@ import java.util.*;
 public class SeqScan implements DbIterator {
 
     private static final long serialVersionUID = 1L;
+
+    private final TransactionId tid;
+    private int tableId;
+    private String tableAlias;
+    private DbFileIterator it;
 
     /**
      * Creates a sequential scan over the specified table as a part of the
@@ -28,16 +34,23 @@ public class SeqScan implements DbIterator {
      *            tableAlias.null, or null.null).
      */
     public SeqScan(TransactionId tid, int tableid, String tableAlias) {
-        // some code goes here
+        this.tid = tid;
+        this.tableId = tableid;
+        this.tableAlias = tableAlias;
     }
+
+    public SeqScan(TransactionId tid, int tableid) {
+        this(tid, tableid, Database.getCatalog().getTableName(tableid));
+    }
+
 
     /**
      * @return
-     *       return the table name of the table the operator scans. This should
+     *       return the table name of the tabl  e the operator scans. This should
      *       be the actual name of the table in the catalog of the database
      * */
     public String getTableName() {
-        return null;
+        return Database.getCatalog().getTableName(tableId);
     }
     
     /**
@@ -46,7 +59,7 @@ public class SeqScan implements DbIterator {
     public String getAlias()
     {
         // some code goes here
-        return null;
+        return tableAlias;
     }
 
     /**
@@ -63,14 +76,16 @@ public class SeqScan implements DbIterator {
      */
     public void reset(int tableid, String tableAlias) {
         // some code goes here
+        this.tableId = tableid;
+        this.tableAlias = tableAlias;
+
     }
 
-    public SeqScan(TransactionId tid, int tableid) {
-        this(tid, tableid, Database.getCatalog().getTableName(tableid));
-    }
 
     public void open() throws DbException, TransactionAbortedException {
         // some code goes here
+        it = Database.getCatalog().getDbFile(tableId).iterator(tid);
+        it.open();
     }
 
     /**
@@ -82,28 +97,43 @@ public class SeqScan implements DbIterator {
      * @return the TupleDesc with field names from the underlying HeapFile,
      *         prefixed with the tableAlias string from the constructor.
      */
+    @Override
     public TupleDesc getTupleDesc() {
         // some code goes here
-        return null;
+        return Database.getCatalog().getTupleDesc(tableId);
     }
 
+    @Override
     public boolean hasNext() throws TransactionAbortedException, DbException {
         // some code goes here
-        return false;
+        if (it == null) return false;
+        return it.hasNext();
     }
 
+
+    @Override
     public Tuple next() throws NoSuchElementException,
             TransactionAbortedException, DbException {
         // some code goes here
-        return null;
+        if(it == null){
+            throw new NoSuchElementException("no next tuple");
+        }
+        Tuple t = it.next();
+        if(t == null){
+            throw new NoSuchElementException("no next tuple");
+        }
+        return t;
     }
+
 
     public void close() {
         // some code goes here
+        it = null;
     }
 
     public void rewind() throws DbException, NoSuchElementException,
             TransactionAbortedException {
         // some code goes here
+        it.rewind();
     }
 }
